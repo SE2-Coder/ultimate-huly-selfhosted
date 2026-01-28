@@ -1,5 +1,20 @@
 name: huly-v7
 services:
+  # --- UI Entrypoint / Gateway ---
+  nginx:
+    image: "nginx:1.21.3"
+    volumes:
+      - ./.huly.nginx:/etc/nginx/conf.d/default.conf
+    restart: unless-stopped
+    networks:
+      - huly_net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.huly-gateway.rule=Host(`${HOST_ADDRESS}`)"
+      - "traefik.http.routers.huly-gateway.entrypoints=websecure"
+      - "traefik.http.services.huly-gateway.loadbalancer.server.port=80"
+      - "traefik.http.routers.huly-gateway.tls.certresolver=letsencrypt"
+
   # --- Infrastructure Services ---
 
   cockroach:
@@ -38,7 +53,7 @@ services:
       - REDPANDA_SUPERUSER_USERNAME=${REDPANDA_ADMIN_USER}
       - REDPANDA_SUPERUSER_PASSWORD=${REDPANDA_ADMIN_PWD}
     healthcheck:
-      test: ['CMD', 'rpk', 'cluster', 'info', '-X', 'user=${REDPANDA_ADMIN_USER}', '-X', 'pass=${REDPANDA_ADMIN_PWD}']
+      test: [ 'CMD', 'rpk', 'cluster', 'info', '-X', 'user=${REDPANDA_ADMIN_USER}', '-X', 'pass=${REDPANDA_ADMIN_PWD}' ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -54,7 +69,7 @@ services:
       - MINIO_ROOT_USER=${MINIO_ROOT_USER}
       - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD}
     healthcheck:
-      test: ['CMD', 'mc', 'ready', 'local']
+      test: [ 'CMD', 'mc', 'ready', 'local' ]
       interval: 5s
       retries: 10
     restart: unless-stopped
@@ -202,13 +217,6 @@ services:
 
   front:
     image: hardcoreeng/front:${HULY_VERSION}
-    # Expose this service via Dokploy/Traefik
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.huly-front.rule=Host(`${HOST_ADDRESS}`)"
-      - "traefik.http.routers.huly-front.entrypoints=websecure"
-      - "traefik.http.services.huly-front.loadbalancer.server.port=8080"
-      - "traefik.http.routers.huly-front.tls.certresolver=letsencrypt"
     environment:
       - SERVER_PORT=8080
       - SERVER_SECRET=${SECRET}
@@ -238,6 +246,7 @@ volumes:
   cr_data:
   cr_certs:
   redpanda:
+
 
 networks:
   huly_net:

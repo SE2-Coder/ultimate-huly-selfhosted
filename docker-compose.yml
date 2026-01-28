@@ -8,12 +8,14 @@ services:
     restart: unless-stopped
     networks:
       - huly_net
+      - dokploy-network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.huly-gateway.rule=Host(`${HOST_ADDRESS}`)"
       - "traefik.http.routers.huly-gateway.entrypoints=websecure"
-      - "traefik.http.services.huly-gateway.loadbalancer.server.port=80"
       - "traefik.http.routers.huly-gateway.tls.certresolver=letsencrypt"
+      - "traefik.http.services.huly-gateway.loadbalancer.server.port=80"
+      - "traefik.docker.network=dokploy-network"
 
   # --- Infrastructure Services ---
 
@@ -251,3 +253,5 @@ volumes:
 networks:
   huly_net:
     external: false
+  dokploy-network:
+    external: true

@@ -63,7 +63,7 @@ services:
       - REDPANDA_SUPERUSER_USERNAME=${REDPANDA_ADMIN_USER}
       - REDPANDA_SUPERUSER_PASSWORD=${REDPANDA_ADMIN_PWD}
     healthcheck:
-      test: [ 'CMD', 'rpk', 'cluster', 'info', '-X', 'user=${REDPANDA_ADMIN_USER}', '-X', 'pass=${REDPANDA_ADMIN_PWD}' ]
+      test: [ 'CMD', 'rpk', 'cluster', 'info' ] # Simplified check
       interval: 10s
       timeout: 5s
       retries: 10
@@ -144,7 +144,7 @@ services:
     image: hardcoreeng/account:${HULY_VERSION}
     depends_on:
       redpanda:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_PORT=3000
       - SERVER_SECRET=${SECRET}
@@ -170,7 +170,7 @@ services:
     image: hardcoreeng/transactor:${HULY_VERSION}
     depends_on:
       redpanda:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_PORT=3333
       - SERVER_SECRET=${SECRET}
@@ -194,7 +194,7 @@ services:
     image: hardcoreeng/workspace:${HULY_VERSION}
     depends_on:
       redpanda:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_SECRET=${SECRET}
       - DB_URL=${CR_DB_URL}

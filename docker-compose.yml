@@ -189,6 +189,8 @@ services:
       - LAST_NAME_FIRST=${LAST_NAME_FIRST:-true}
       - QUEUE_CONFIG=redpanda:9092
       - MAIL_URL=http://mail:8097
+      - EMAIL_SERVICE_URL=http://mail:8097
+      - MAIL_AUTH_TOKEN=${SECRET}
     restart: unless-stopped
     deploy:
       resources:

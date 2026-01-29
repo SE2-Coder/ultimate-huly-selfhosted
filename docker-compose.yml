@@ -40,6 +40,7 @@ services:
           memory: 512M
     networks:
       - huly_net
+      - dokploy-network
 
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
@@ -95,6 +96,7 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
   elastic:
     image: "elasticsearch:7.14.2"
@@ -121,6 +123,7 @@ services:
           memory: 1G
     networks:
       - huly_net
+      - dokploy-network
 
   # --- Huly Application Services ---
 
@@ -141,6 +144,7 @@ services:
           memory: 128M
     networks:
       - huly_net
+      - dokploy-network
 
   account:
     image: hardcoreeng/account:${HULY_VERSION}
@@ -167,6 +171,7 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
   transactor:
     image: hardcoreeng/transactor:${HULY_VERSION}
@@ -191,6 +196,7 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
@@ -214,6 +220,7 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
@@ -230,6 +237,7 @@ services:
           memory: 128M
     networks:
       - huly_net
+      - dokploy-network
 
   rekoni:
     image: hardcoreeng/rekoni-service:${HULY_VERSION}
@@ -242,6 +250,7 @@ services:
     restart: unless-stopped
     networks:
       - huly_net
+      - dokploy-network
 
   fulltext:
     image: hardcoreeng/fulltext:${HULY_VERSION}
@@ -262,7 +271,9 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
+  # ... huly continues ...
   stats:
     image: hardcoreeng/stats:${HULY_VERSION}
     environment:
@@ -275,6 +286,7 @@ services:
           memory: 128M
     networks:
       - huly_net
+      - dokploy-network
 
   front:
     image: hardcoreeng/front:${HULY_VERSION}
@@ -304,6 +316,7 @@ services:
           memory: 256M
     networks:
       - huly_net
+      - dokploy-network
 
 volumes:
   elastic:

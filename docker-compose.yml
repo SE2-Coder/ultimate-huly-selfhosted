@@ -102,6 +102,23 @@ services:
     networks:
       - dokploy-network
 
+  mail:
+    image: hardcoreeng/mail:${HULY_VERSION}
+    environment:
+      - PORT=8097
+      - SOURCE=${SMTP_SOURCE}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    networks:
+      - dokploy-network
+
   # --- Huly Application Services ---
 
   kvs:

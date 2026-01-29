@@ -111,6 +111,9 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USERNAME=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_TLS_MODE=${SMTP_TLS_MODE:-upgrade}
+      - SMTP_DEBUG_LOG=true
+      - API_KEY=${SECRET}
     restart: unless-stopped
     deploy:
       resources:
@@ -158,6 +161,8 @@ services:
       - QUEUE_CONFIG=redpanda:9092
       - ACCOUNTS_DB_URL=${CR_DB_URL}
       - MAIL_URL=http://mail:8097
+      - EMAIL_SERVICE_URL=http://mail:8097
+      - MAIL_AUTH_TOKEN=${SECRET}
       - DISABLE_SIGNUP=${DISABLE_SIGNUP:-false}
     restart: unless-stopped
     deploy:

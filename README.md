@@ -2,13 +2,22 @@
 
 This repository contains a production-ready configuration for self-hosting **Huly v7** (Platform for Project Management) using **Dokploy**.
 
+This project is maintained by [se2code.com](https://www.se2code.com), specializing in high-performance self-hosted infrastructure.
+
 It has been modernized to support the latest Huly architecture:
 - **CockroachDB** (replaces MongoDB)
 - **Redpanda** (Kafka compatible)
 - **MinIO** & **Elasticsearch**
-- **Traefik** Integration (via Dokploy labels) - No separate Nginx container required.
+- **Traefik** Integration (via Dokploy labels).
 
-## 🚀 Deployment Instructions
+## 🚀 Requisitos de Hardware
+
+Para un funcionamiento estable de todo el stack (Elasticsearch, CockroachDB, Redpanda), se recomienda:
+* **RAM**: Mínimo **4GB** (8GB recomendado para entornos de producción). El stack completo consume aproximadamente 3.5GB en reposo.
+* **CPU**: 2 Cores o más.
+* **OS**: Linux con Docker y Dokploy instalado.
+
+## 🛠️ Instalación en Dokploy
 
 ### 1. Prerequisites
 **CRITICAL**: On your Dokploy Host Server, you must run:
@@ -35,4 +44,4 @@ Click **Deploy** in Dokploy.
 - `.env.example`: Template for environment variables.
 
 ---
-*Maintained by SE2-Coder*
+Desarrollado y mantenido con ❤️ por [se2code.com](https://www.se2code.com). Si necesitas ayuda con tu despliegue, visítanos.

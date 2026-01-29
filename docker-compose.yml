@@ -55,24 +55,26 @@ services:
       - --advertise-rpc-addr redpanda:33145
       - --mode dev-container
       - --smp 1
-      - --memory 512M
+      - --memory 768M
+      - --reserve-memory 0M
     # container_name: redpanda
     volumes:
       - redpanda:/var/lib/redpanda/data
     environment:
       - REDPANDA_SUPERUSER_USERNAME=${REDPANDA_ADMIN_USER}
       - REDPANDA_SUPERUSER_PASSWORD=${REDPANDA_ADMIN_PWD}
-    healthcheck:
-      test: [ 'CMD', 'rpk', 'cluster', 'info' ] # Simplified check
-      interval: 10s
-      timeout: 5s
-      retries: 10
+    # healthcheck:
+    #   test: [ 'CMD', 'rpk', 'cluster', 'info' ]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 10
     deploy:
       resources:
         limits:
-          memory: 768M
+          memory: 1G
     networks:
       - huly_net
+      - dokploy-network
 
   minio:
     image: "minio/minio"

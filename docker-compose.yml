@@ -140,6 +140,8 @@ services:
       - ACCOUNT_PORT=3000
       - QUEUE_CONFIG=redpanda:9092
       - ACCOUNTS_DB_URL=${CR_DB_URL}
+      - MAIL_URL=http://mail:8097
+      - DISABLE_SIGNUP=${DISABLE_SIGNUP:-false}
     restart: unless-stopped
     deploy:
       resources:
@@ -164,6 +166,7 @@ services:
       - STATS_URL=http://stats:4900
       - LAST_NAME_FIRST=${LAST_NAME_FIRST:-true}
       - QUEUE_CONFIG=redpanda:9092
+      - MAIL_URL=http://mail:8097
     restart: unless-stopped
     deploy:
       resources:
@@ -280,6 +283,7 @@ services:
       - "DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-en}"
       - "LAST_NAME_FIRST=${LAST_NAME_FIRST:-true}"
       - "DESKTOP_UPDATES_CHANNEL=0.7.353"
+      - DISABLE_SIGNUP=${DISABLE_SIGNUP:-false}
     restart: unless-stopped
     deploy:
       resources:

@@ -90,24 +90,7 @@ app.post('/send', checkAuth, async (req, res) => {
         const fromAddress = from || process.env.SMTP_SOURCE || process.env.SMTP_USER;
         console.log('Using from address:', fromAddress);
 
-        // Verify connection first
-        try {
-            await transporter.verify();
-            console.log('STMP connection verified');
-        } catch (verifyError) {
-            console.error('SMTP Verify Error Details:', {
-                message: verifyError.message,
-                code: verifyError.code,
-                command: verifyError.command,
-                response: verifyError.response,
-                stack: verifyError.stack
-            });
-            return res.status(500).json({
-                error: 'SMTP connection failed',
-                message: verifyError.message,
-                code: verifyError.code
-            });
-        }
+
 
         const mailOptions = {
             from: from || process.env.SMTP_SOURCE || process.env.SMTP_USER,
@@ -120,7 +103,7 @@ app.post('/send', checkAuth, async (req, res) => {
         const info = await transporter.sendMail(mailOptions);
         console.log('Message sent: %s', info.messageId);
 
-        res.json({ success: true, messageId: info.messageId });
+        res.json({ status: 'ok', messageId: info.messageId });
 
     } catch (error) {
         console.error('Error sending email:', error);

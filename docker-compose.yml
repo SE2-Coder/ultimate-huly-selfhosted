@@ -113,6 +113,7 @@ services:
       - SMTP_USER=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
       - SMTP_TLS_MODE=${SMTP_TLS_MODE}
+      - SMTP_SOURCE=${SMTP_SOURCE}
       - SMTP_DEBUG_LOG=true
       - API_KEY=${SECRET}
     restart: unless-stopped

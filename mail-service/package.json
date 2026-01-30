@@ -1,0 +1,14 @@
+{
+  "name": "huly-mail-service",
+  "version": "1.0.0",
+  "description": "Custom mail service for Huly",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "nodemailer": "^6.9.7",
+    "cors": "^2.8.5"
+  }
+}

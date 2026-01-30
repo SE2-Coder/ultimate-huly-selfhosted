@@ -103,15 +103,16 @@ services:
       - dokploy-network
 
   mail:
-    image: hardcoreeng/mail:${HULY_VERSION}
+    build: ./mail-service
+    container_name: huly-mail
     environment:
-      - PORT=8097
-      - SOURCE=${SMTP_SOURCE}
-      - SMTP_HOST=${SMTP_HOST}
-      - SMTP_PORT=${SMTP_PORT}
-      - SMTP_USERNAME=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - SMTP_TLS_MODE=${SMTP_TLS_MODE:-upgrade}
+      - PORT=3000
+      - SOURCE=noreply
+      - SMTP_HOST
+      - SMTP_PORT
+      - SMTP_USER
+      - SMTP_PASSWORD
+      - SMTP_TLS_MODE
       - SMTP_DEBUG_LOG=true
       - API_KEY=${SECRET}
     restart: unless-stopped

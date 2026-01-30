@@ -127,7 +127,10 @@ app.listen(port, () => {
       PORT: port,
       SMTP_HOST: process.env.SMTP_HOST,
       SMTP_PORT: process.env.SMTP_PORT,
-      TLS_MODE: process.env.SMTP_TLS_MODE,
+      SMTP_USER: process.env.SMTP_USER,
+      SMTP_PASSWORD: process.env.SMTP_PASSWORD ? '********' : 'NOT SET',
+      SMTP_TLS_MODE: process.env.SMTP_TLS_MODE,
+      SMTP_SOURCE: process.env.SMTP_SOURCE,
       API_KEY_SET: !!process.env.API_KEY
   });
 });

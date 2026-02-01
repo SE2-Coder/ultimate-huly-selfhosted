@@ -9,51 +9,66 @@ server {
     set $upstream_transactor transactor;
     set $upstream_rekoni rekoni;
     set $upstream_stats stats;
+    set $upstream_front front;
 
-    location / {
+    location /_accounts/ {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://front:8080;
+        proxy_pass http://$upstream_account:3000/;
     }
 
-    location ~ ^/_accounts(?<rest>.*)$ {
+    location /_accounts {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        set $p_rest $rest;
-        if ($p_rest = "") { set $p_rest /; }
-        proxy_pass http://$upstream_account:3000$p_rest;
+        proxy_pass http://$upstream_account:3000/;
     }
 
-    location ~ ^/_collaborator(?<rest>.*)$ {
+    location /_collaborator/ {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        set $p_rest $rest;
-        if ($p_rest = "") { set $p_rest /; }
-        proxy_pass http://$upstream_collaborator:3078$p_rest;
+        proxy_pass http://$upstream_collaborator:3078/;
     }
 
-    location ~ ^/_transactor(?<rest>.*)$ {
+    location /_collaborator {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        set $p_rest $rest;
-        if ($p_rest = "") { set $p_rest /; }
-        proxy_pass http://$upstream_transactor:3333$p_rest;
+        proxy_pass http://$upstream_collaborator:3078/;
+    }
+
+    location /_transactor/ {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://$upstream_transactor:3333/;
+    }
+
+    location /_transactor {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_pass http://$upstream_transactor:3333/;
     }
 
     location ~ ^/eyJ {
@@ -61,30 +76,49 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         proxy_pass http://$upstream_transactor:3333;
     }
 
-    location ~ ^/_rekoni(?<rest>.*)$ {
+    location /_rekoni/ {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        set $p_rest $rest;
-        if ($p_rest = "") { set $p_rest /; }
-        proxy_pass http://$upstream_rekoni:4004$p_rest;
+        proxy_pass http://$upstream_rekoni:4004/;
     }
 
-    location ~ ^/_stats(?<rest>.*)$ {
+    location /_rekoni {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        set $p_rest $rest;
-        if ($p_rest = "") { set $p_rest /; }
-        proxy_pass http://$upstream_stats:4900$p_rest;
+        proxy_pass http://$upstream_rekoni:4004/;
+    }
+
+    location /_stats/ {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://$upstream_stats:4900/;
+    }
+
+    location /_stats {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://$upstream_stats:4900/;
+    }
+
+    location / {
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_pass http://$upstream_front:8080;
     }
 }

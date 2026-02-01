@@ -1,3 +1,4 @@
+name: huly-v7
 services:
   # --- UI Entrypoint / Gateway ---
   nginx:
@@ -12,6 +13,7 @@ services:
           memory: 64M
     networks:
       - dokploy-network
+      - huly_net
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.huly-gateway.rule=Host(`${HOST_ADDRESS}`)"
@@ -25,7 +27,7 @@ services:
   cockroach:
     container_name: cockroach
     image: cockroachdb/cockroach:latest-v24.2
-    command: start-single-node --accept-sql-without-tls --cache=128MiB --max-sql-memory=128MiB
+    command: start-single-node --accept-sql-without-tls --cache=128MiB --max-sql-memory=128MiB --host=0.0.0.0 --http-host=0.0.0.0
     environment:
       - COCKROACH_DATABASE=${CR_DATABASE}
       - COCKROACH_USER=${CR_USERNAME}
@@ -39,7 +41,7 @@ services:
         limits:
           memory: 1G
     networks:
-      - dokploy-network
+      - huly_net
 
   redpanda:
     container_name: redpanda
@@ -66,7 +68,7 @@ services:
         limits:
           memory: 1G
     networks:
-      - dokploy-network
+      - huly_net
 
   minio:
     container_name: minio
@@ -83,7 +85,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
   elastic:
     container_name: elastic
@@ -104,7 +106,7 @@ services:
         limits:
           memory: 1.5G
     networks:
-      - dokploy-network
+      - huly_net
 
   mail:
     build: ./mail-service
@@ -126,7 +128,7 @@ services:
         limits:
           memory: 128M
     networks:
-      - dokploy-network
+      - huly_net
 
   # --- Huly Application Services ---
 
@@ -145,7 +147,7 @@ services:
         limits:
           memory: 256M
     networks:
-      - dokploy-network
+      - huly_net
 
   account:
     container_name: account
@@ -178,7 +180,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
   transactor:
     container_name: transactor
@@ -206,7 +208,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
   workspace:
     container_name: workspace
@@ -230,7 +232,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
   collaborator:
     container_name: collaborator
@@ -247,7 +249,7 @@ services:
         limits:
           memory: 256M
     networks:
-      - dokploy-network
+      - huly_net
 
   rekoni:
     container_name: rekoni
@@ -260,7 +262,7 @@ services:
           memory: 400M
     restart: unless-stopped
     networks:
-      - dokploy-network
+      - huly_net
 
   fulltext:
     container_name: fulltext
@@ -284,7 +286,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
   stats:
     container_name: stats
@@ -298,7 +300,7 @@ services:
         limits:
           memory: 256M
     networks:
-      - dokploy-network
+      - huly_net
 
   front:
     container_name: front
@@ -329,7 +331,7 @@ services:
         limits:
           memory: 512M
     networks:
-      - dokploy-network
+      - huly_net
 
 volumes:
   elastic:
@@ -342,3 +344,5 @@ volumes:
 networks:
   dokploy-network:
     external: true
+  huly_net:
+    driver: bridge

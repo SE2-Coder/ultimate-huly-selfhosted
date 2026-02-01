@@ -3,20 +3,15 @@ server {
     server_name _;
     client_max_body_size 100M;
 
-    resolver 127.0.0.11 valid=30s;
-    set $upstream_account account;
-    set $upstream_collaborator collaborator;
-    set $upstream_transactor transactor;
-    set $upstream_rekoni rekoni;
-    set $upstream_stats stats;
-    set $upstream_front front;
+    error_log /dev/stdout info;
+    access_log /dev/stdout;
 
     location /_accounts/ {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_account:3000/;
+        proxy_pass http://account:3000/;
     }
 
     location /_accounts {
@@ -24,7 +19,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_account:3000/;
+        proxy_pass http://account:3000/;
     }
 
     location /_collaborator/ {
@@ -35,7 +30,7 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass http://$upstream_collaborator:3078/;
+        proxy_pass http://collaborator:3078/;
     }
 
     location /_collaborator {
@@ -46,7 +41,7 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass http://$upstream_collaborator:3078/;
+        proxy_pass http://collaborator:3078/;
     }
 
     location /_transactor/ {
@@ -57,7 +52,7 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass http://$upstream_transactor:3333/;
+        proxy_pass http://transactor:3333/;
     }
 
     location /_transactor {
@@ -68,7 +63,7 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass http://$upstream_transactor:3333/;
+        proxy_pass http://transactor:3333/;
     }
 
     location ~ ^/eyJ {
@@ -79,7 +74,7 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_pass http://$upstream_transactor:3333;
+        proxy_pass http://transactor:3333;
     }
 
     location /_rekoni/ {
@@ -87,7 +82,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_rekoni:4004/;
+        proxy_pass http://rekoni:4004/;
     }
 
     location /_rekoni {
@@ -95,7 +90,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_rekoni:4004/;
+        proxy_pass http://rekoni:4004/;
     }
 
     location /_stats/ {
@@ -103,7 +98,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_stats:4900/;
+        proxy_pass http://stats:4900/;
     }
 
     location /_stats {
@@ -111,7 +106,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_stats:4900/;
+        proxy_pass http://stats:4900/;
     }
 
     location / {
@@ -119,6 +114,6 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_pass http://$upstream_front:8080;
+        proxy_pass http://front:8080;
     }
 }

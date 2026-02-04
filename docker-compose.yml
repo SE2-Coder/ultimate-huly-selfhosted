@@ -318,6 +318,33 @@ services:
     networks:
       - dokploy-network
 
+  restic-backup:
+    image: restic/restic:latest
+    volumes:
+      - files:/backup/minio:ro
+      - cr_data:/backup/db:ro
+      - elastic:/backup/elastic:ro
+    environment:
+      - RESTIC_REPOSITORY=s3:https://${S3_ENDPOINT}/${S3_BUCKET}/restic
+      - AWS_ACCESS_KEY_ID=${S3_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${S3_SECRET_KEY}
+      - RESTIC_PASSWORD=${RESTIC_PASSWORD:-huly-backup-password}
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        restic init || echo "Repository already initialized"
+        while true; do
+          echo "Starting snapshot at $$(date)"
+          restic backup /backup
+          restic forget --keep-last 10 --prune
+          echo "Finished snapshot. Sleeping for 12 hours..."
+          sleep 43200
+        done
+    restart: unless-stopped
+    networks:
+      - dokploy-network
+
 volumes:
   elastic:
   files:

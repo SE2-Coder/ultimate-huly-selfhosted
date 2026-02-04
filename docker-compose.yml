@@ -41,7 +41,7 @@ services:
       - dokploy-network
 
   redpanda:
-    image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
+    image: redpandadata/redpanda:v24.3.6
     command:
       - redpanda
       - start

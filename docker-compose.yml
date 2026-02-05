@@ -164,6 +164,8 @@ services:
         condition: service_started
       cockroach:
         condition: service_started
+      db-init:
+        condition: service_completed_successfully
     environment:
       - SERVER_PORT=3000
       - SERVER_SECRET=${SECRET}
@@ -194,6 +196,8 @@ services:
     depends_on:
       redpanda:
         condition: service_started
+      db-init:
+        condition: service_completed_successfully
     environment:
       - SERVER_PORT=3333
       - SERVER_SECRET=${SECRET}

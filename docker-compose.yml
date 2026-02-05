@@ -47,7 +47,7 @@ services:
       - start
       - --overprovisioned
       - --smp 1
-      - --memory 512M
+      - --memory 350M
       - --reserve-memory 0M
       - --node-id 0
       - --check=false

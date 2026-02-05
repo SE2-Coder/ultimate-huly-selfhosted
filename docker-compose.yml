@@ -33,12 +33,12 @@ services:
       - cr_data:/cockroach/cockroach-data
       - cr_certs:/cockroach/certs
     restart: unless-stopped
+    networks:
+      - dokploy-network
     deploy:
       resources:
         limits:
-          memory: 1G
-    networks:
-      - dokploy-network
+          memory: 512M
 
   redpanda:
     image: redpandadata/redpanda:v24.3.6
@@ -47,7 +47,7 @@ services:
       - start
       - --overprovisioned
       - --smp 1
-      - --memory 768M
+      - --memory 512M
       - --reserve-memory 0M
       - --node-id 0
       - --check=false
@@ -62,7 +62,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 512M
     networks:
       - dokploy-network
 
@@ -78,7 +78,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 256M
     networks:
       - dokploy-network
 
@@ -247,7 +247,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 400M
+          memory: 300M
     restart: unless-stopped
     networks:
       - dokploy-network

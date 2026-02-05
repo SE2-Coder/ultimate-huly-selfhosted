@@ -40,6 +40,21 @@ services:
         limits:
           memory: 512M
 
+  db-init:
+    image: cockroachdb/cockroach:latest-v24.2
+    depends_on:
+      cockroach:
+        condition: service_started
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        /cockroach/cockroach sql --insecure --host=cockroach -e "CREATE USER IF NOT EXISTS ${CR_USERNAME} WITH PASSWORD '${CR_USER_PASSWORD}';"
+        /cockroach/cockroach sql --insecure --host=cockroach -e "CREATE DATABASE IF NOT EXISTS ${CR_DATABASE};"
+        /cockroach/cockroach sql --insecure --host=cockroach -e "GRANT ALL ON DATABASE ${CR_DATABASE} TO ${CR_USERNAME};"
+    networks:
+      - dokploy-network
+
   redpanda:
     image: redpandadata/redpanda:v24.3.6
     command:

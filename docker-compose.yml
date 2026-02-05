@@ -49,9 +49,15 @@ services:
       - /bin/sh
       - -c
       - |
+        echo "Waiting for CockroachDB to be ready..."
+        until /cockroach/cockroach sql --insecure --host=cockroach -e "SELECT 1" > /dev/null 2>&1; do
+          sleep 2
+        done
+        echo "CockroachDB is ready. Initializing..."
         /cockroach/cockroach sql --insecure --host=cockroach -e "CREATE USER IF NOT EXISTS ${CR_USERNAME} WITH PASSWORD '${CR_USER_PASSWORD}';"
         /cockroach/cockroach sql --insecure --host=cockroach -e "CREATE DATABASE IF NOT EXISTS ${CR_DATABASE};"
         /cockroach/cockroach sql --insecure --host=cockroach -e "GRANT ALL ON DATABASE ${CR_DATABASE} TO ${CR_USERNAME};"
+        echo "Initialization complete."
     networks:
       - dokploy-network
 

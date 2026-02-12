@@ -36,34 +36,31 @@ while true; do
     echo "Starting backup job at $TIMESTAMP..."
 
     # 1. CockroachDB Dump (Hot Backup)
-    # We use pg_dump (psql) or cockroach dump via the built-in binary in the image
-    # Note: The sidecar image should have postgresql-client or cockroach binary
+    # We prefer pg_dump for Community Edition as 'cockroach dump' is deprecated/removed
     
     echo "Dumping Database..."
     mkdir -p /tmp/db_dump
     
-    # Using pg_dump if available, else cockroach sql
-    # Connection string: postgres://root@cockroach:26257/defaultdb?sslmode=disable
-    # We use root for dump to ensure we get everything permissions-wise
-    
-    if command -v cockroach >/dev/null 2>&1; then
+    if command -v pg_dump >/dev/null 2>&1; then
+        # Use pg_dump if available (Standard for Community Edition)
+        echo "Using pg_dump..."
+        PGPASSWORD=${CR_USER_PASSWORD:-root} pg_dump \
+            -h cockroach -p 26257 -U root -d huly \
+            -f /tmp/db_dump/huly.sql || echo "pg_dump failed"
+            
+    elif command -v cockroach >/dev/null 2>&1; then
+        # Fallback to cockroach sql (Enterprise/Legacy)
+        # Check connection first
         cockroach sql --url "postgres://root@cockroach:26257/defaultdb?sslmode=disable" \
             --format=csv \
             -e "SELECT 1" >/dev/null 2>&1 || echo "CockroachDB check failed."
 
-        # Note: BACKUP statement requires enterprise/S3. We use dump for community.
-        echo "Exporting SQL dump..."
+        echo "Attempting cockroach dump (legacy)..."
         cockroach dump huly \
             --url "postgres://root@cockroach:26257/huly?sslmode=disable" \
             > /tmp/db_dump/huly.sql 2>/tmp/db_dump/dump.log || cat /tmp/db_dump/dump.log
-            
-    elif command -v pg_dump >/dev/null 2>&1; then
-        PGPASSWORD=${CR_USER_PASSWORD} pg_dump \
-            -h cockroach -p 26257 -U root -d huly \
-            -f /tmp/db_dump/huly.sql
     else
-        echo "ERROR: No database dump tool found (cockroach or pg_dump)."
-        # We continue to backup files at least
+        echo "ERROR: No database dump tool found (pg_dump or cockroach)."
     fi
 
     # 2. Restic Backup

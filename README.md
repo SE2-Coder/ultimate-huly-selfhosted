@@ -9,6 +9,29 @@ We maintain this project updated to ensure security and stability for Docker Com
 *Specialists in high-performance infrastructure and self-hosted solutions.*
 ---
 
+### Database Backups (S3)
+
+If you configure the S3 variables in `.env`, the system will automatically:
+- Create a `backup` sidecar container.
+- Perform a **Hot Backup** of CockroachDB (SQL Dump) every 6 hours.
+- Perform an incremental backup of MinIO files.
+- Upload everything to your S3 bucket using Restic (encrypted and deduplicated).
+
+#### Manual Backup
+To trigger an immediate backup:
+```bash
+docker exec -it <project>-backup-1 /scripts/backup-daemon.sh
+```
+
+#### Restore
+To restore from the latest S3 snapshot:
+```bash
+# STOPS services to ensure data consistency
+docker compose run --rm backup restore
+# Then restart
+docker compose restart
+```
+
 ## ✨ Key Features
 
 This configuration has been modernized and enhanced by our team:

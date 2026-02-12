@@ -24,11 +24,7 @@ services:
 
   cockroach:
     image: cockroachdb/cockroach:latest-v24.2
-    command: start-single-node --accept-sql-without-tls --cache=128MiB --max-sql-memory=128MiB
-    environment:
-      - COCKROACH_DATABASE=${CR_DATABASE}
-      - COCKROACH_USER=${CR_USERNAME}
-      - COCKROACH_PASSWORD=${CR_USER_PASSWORD}
+    command: start-single-node --insecure --cache=128MiB --max-sql-memory=128MiB
     volumes:
       - cr_data:/cockroach/cockroach-data
       - cr_certs:/cockroach/certs
@@ -36,7 +32,7 @@ services:
     networks:
       - dokploy-network
     healthcheck:
-      test: [ "CMD-SHELL", "/cockroach/cockroach sql --url='postgresql://root@localhost:26257/defaultdb?sslmode=disable' -e 'SELECT 1'" ]
+      test: [ "CMD", "/cockroach/cockroach", "sql", "--insecure", "-e", "SELECT 1" ]
       interval: 10s
       timeout: 5s
       retries: 5

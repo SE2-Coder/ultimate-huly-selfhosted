@@ -1,15 +1,13 @@
-FROM debian:bullseye-slim
+FROM postgres:12-alpine
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    restic \
-    postgresql-client \
-    jq \
-    && rm -rf /var/lib/apt/lists/*
+# - restic: Backup tool (Alpine repositories have recent versions)
+# - curl: Downloader
+# - jq: JSON processor
+# - gcompat: GLIBC compatibility layer (better than libc6-compat)
+RUN apk add --no-cache restic curl jq gcompat
 
-# Install CockroachDB client binary
+# Install CockroachDB client binary (Optional fallback, but good to have)
 RUN curl -O https://binaries.cockroachdb.com/cockroach-v24.2.0.linux-amd64.tgz \
     && tar -xzf cockroach-v24.2.0.linux-amd64.tgz \
     && cp cockroach-v24.2.0.linux-amd64/cockroach /usr/local/bin/ \

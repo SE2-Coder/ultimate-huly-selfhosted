@@ -1,15 +1,15 @@
-FROM alpine:latest
+FROM debian:bookworm-slim
 
 # Install dependencies
-# - restic: The backup tool
-# - postgresql-client: pg_dump (if needed)
-# - curl: to download cockroach binary
-# - jq: for JSON parsing in scripts
-# - libc6-compat: required for cockroach binary on alpine
-RUN apk add --no-cache restic postgresql-client curl jq libc6-compat
+RUN apt-get update && apt-get install -y \
+    curl \
+    ca-certificates \
+    restic \
+    postgresql-client \
+    jq \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install CockroachDB client binary (for specialized dump)
-# We use the same version as the main container to avoid compatibility issues
+# Install CockroachDB client binary
 RUN curl -O https://binaries.cockroachdb.com/cockroach-v24.2.0.linux-amd64.tgz \
     && tar -xzf cockroach-v24.2.0.linux-amd64.tgz \
     && cp cockroach-v24.2.0.linux-amd64/cockroach /usr/local/bin/ \

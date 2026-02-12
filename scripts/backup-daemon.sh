@@ -22,6 +22,14 @@ export AWS_SECRET_ACCESS_KEY="${S3_SECRET_KEY}"
 echo "Initializing Restic Repository at $RESTIC_REPOSITORY..."
 restic init || echo "Repository already initialized or accessible."
 
+# Check for --once flag
+ONCE=0
+for arg in "$@"; do
+    if [ "$arg" = "--once" ]; then
+        ONCE=1
+    fi
+done
+
 # Main Loop
 while true; do
     TIMESTAMP=$(date +%Y%m%d_%H%M%S)
@@ -41,16 +49,13 @@ while true; do
     if command -v cockroach >/dev/null 2>&1; then
         cockroach sql --url "postgres://root@cockroach:26257/defaultdb?sslmode=disable" \
             --format=csv \
-            -e "BACKUP TO 'http://minio:9000/backup-bucket/db-${TIMESTAMP}?AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}&AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}' AS OF SYSTEM TIME '-10s';" \
-            || echo "Using SQL Dump fallback..."
-            
-        # Fallback: SQL Dump to file (safer for generic restore)
-        # Note: 'cockroach dump' is deprecated in favor of BACKUP, but BACKUP requires enterprise or S3 destination
-        # For Community Edition, we use 'cockroach dump' or 'pg_dump'
-        
+            -e "SELECT 1" >/dev/null 2>&1 || echo "CockroachDB check failed."
+
+        # Note: BACKUP statement requires enterprise/S3. We use dump for community.
+        echo "Exporting SQL dump..."
         cockroach dump huly \
             --url "postgres://root@cockroach:26257/huly?sslmode=disable" \
-            > /tmp/db_dump/huly.sql
+            > /tmp/db_dump/huly.sql 2>/tmp/db_dump/dump.log || cat /tmp/db_dump/dump.log
             
     elif command -v pg_dump >/dev/null 2>&1; then
         PGPASSWORD=${CR_USER_PASSWORD} pg_dump \
@@ -79,6 +84,11 @@ while true; do
 
     # Cleanup
     rm -rf /tmp/db_dump
+
+    if [ "$ONCE" -eq 1 ]; then
+        echo "Single run completed. Exiting."
+        exit 0
+    fi
 
     echo "Backup completed. Sleeping for $BACKUP_INTERVAL seconds..."
     sleep $BACKUP_INTERVAL

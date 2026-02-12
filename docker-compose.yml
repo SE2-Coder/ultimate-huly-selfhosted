@@ -33,12 +33,18 @@ services:
       - cr_data:/cockroach/cockroach-data
       - cr_certs:/cockroach/certs
     restart: unless-stopped
+    networks:
+      - dokploy-network
+    healthcheck:
+      test: [ "CMD-SHELL", "/cockroach/cockroach sql --url='postgresql://root@localhost:26257/defaultdb?sslmode=disable' -e 'SELECT 1'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
           memory: 1G
-    networks:
-      - dokploy-network
 
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.6

@@ -95,7 +95,7 @@ services:
 
   # --- Backup Manager (Atomic Strategy) ---
   huly-backup-manager:
-    image: postgres:12-alpine
+    image: postgres:15-alpine
     container_name: huly_backup_manager
     depends_on:
       cockroach:

@@ -84,31 +84,20 @@ services:
     networks:
       - dokploy-network
 
-  backup:
-    image: huly/backup:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.backup
+  # --- Backup Manager (Atomic Strategy) ---
+  huly-backup-manager:
+    image: postgres:12-alpine
+    container_name: huly_backup_manager
     depends_on:
       cockroach:
         condition: service_healthy
-      minio:
-        condition: service_started
+    env_file: /home/ubuntu/huly-infra/.env_backup
     volumes:
-      - files:/backup/files:ro
-      - ./scripts:/scripts:ro
-    environment:
-      - BACKUP_INTERVAL=${BACKUP_INTERVAL:-21600}
-      - CR_HOST=cockroach
-      - CR_USER=root
-      - S3_BUCKET=${S3_BUCKET}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ACCESS_KEY=${S3_ACCESS_KEY}
-      - S3_SECRET_KEY=${S3_SECRET_KEY}
-      - RESTIC_PASSWORD=${RESTIC_PASSWORD}
-      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
-      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
-    entrypoint: [ "/bin/sh", "/scripts/backup-daemon.sh" ]
+      - files:/data/huly_files:ro
+      - /home/ubuntu/huly-infra/scripts:/scripts:ro
+      - /home/ubuntu/huly-infra/backups_tmp:/tmp/backups
+    entrypoint: [ "/bin/sh", "-c", "apk add --no-cache restic aws-cli && crond -f" ]
+    restart: always
     deploy:
       resources:
         limits:
@@ -164,9 +153,9 @@ services:
     image: hardcoreeng/hulykvs:${HULY_VERSION}
     depends_on:
       cockroach:
-        condition: service_started
+        condition: service_healthy
     environment:
-      - HULY_DB_CONNECTION=${CR_DB_URL}
+      - HULY_DB_CONNECTION=postgresql://root@cockroach:26257/huly?sslmode=disable
       - HULY_TOKEN_SECRET=${SECRET}
     restart: unless-stopped
     deploy:
@@ -182,11 +171,11 @@ services:
       redpanda:
         condition: service_started
       cockroach:
-        condition: service_started
+        condition: service_healthy
     environment:
       - SERVER_PORT=3000
       - SERVER_SECRET=${SECRET}
-      - DB_URL=${CR_DB_URL}
+      - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
       - TRANSACTOR_URL=ws://transactor:3333;wss://${HOST_ADDRESS}/_transactor
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - FRONT_URL=https://${HOST_ADDRESS}
@@ -195,7 +184,7 @@ services:
       - ACCOUNTS_URL=http://account:3000
       - ACCOUNT_PORT=3000
       - QUEUE_CONFIG=redpanda:9092
-      - ACCOUNTS_DB_URL=${CR_DB_URL}
+      - ACCOUNTS_DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
       - MAIL_URL=http://mail:3000
       - EMAIL_SERVICE_URL=http://mail:3000
       - MAIL_AUTH_TOKEN=${SECRET}
@@ -213,10 +202,12 @@ services:
     depends_on:
       redpanda:
         condition: service_started
+      cockroach:
+        condition: service_healthy
     environment:
       - SERVER_PORT=3333
       - SERVER_SECRET=${SECRET}
-      - DB_URL=${CR_DB_URL}
+      - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - FRONT_URL=https://${HOST_ADDRESS}
       - ACCOUNTS_URL=http://account:3000
@@ -240,16 +231,18 @@ services:
     depends_on:
       redpanda:
         condition: service_started
+      cockroach:
+        condition: service_healthy
     environment:
       - SERVER_SECRET=${SECRET}
-      - DB_URL=${CR_DB_URL}
+      - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
       - TRANSACTOR_URL=ws://transactor:3333;wss://${HOST_ADDRESS}/_transactor
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=http://account:3000
       - STATS_URL=http://stats:4900
       - QUEUE_CONFIG=redpanda:9092
-      - ACCOUNTS_DB_URL=${CR_DB_URL}
+      - ACCOUNTS_DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
     restart: unless-stopped
     deploy:
       resources:
@@ -260,6 +253,9 @@ services:
 
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
+    depends_on:
+      cockroach:
+        condition: service_healthy
     environment:
       - COLLABORATOR_PORT=3078
       - SECRET=${SECRET}
@@ -291,9 +287,11 @@ services:
     depends_on:
       elastic:
         condition: service_started
+      cockroach:
+        condition: service_healthy
     environment:
       - SERVER_SECRET=${SECRET}
-      - DB_URL=${CR_DB_URL}
+      - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
       - FULLTEXT_DB_URL=http://elastic:9200
       - ELASTIC_INDEX_NAME=huly_storage_index
       - STORAGE_CONFIG=minio|minio?accessKey=${MINIO_ACCESS_KEY}&secretKey=${MINIO_SECRET_KEY}

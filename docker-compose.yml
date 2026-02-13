@@ -91,12 +91,12 @@ services:
     depends_on:
       cockroach:
         condition: service_healthy
-    env_file: /home/ubuntu/huly-infra/.env_backup
     volumes:
       - files:/data/huly_files:ro
       - /home/ubuntu/huly-infra/scripts:/scripts:ro
       - /home/ubuntu/huly-infra/backups_tmp:/tmp/backups
-    entrypoint: [ "/bin/sh", "-c", "apk add --no-cache restic aws-cli && crond -f" ]
+      - /home/ubuntu/huly-infra/.env_backup:/app/.env_backup:ro
+    entrypoint: [ "/bin/sh", "-c", "export $(cat /app/.env_backup | xargs) && apk add --no-cache restic aws-cli && crond -f" ]
     restart: always
     deploy:
       resources:

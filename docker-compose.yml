@@ -36,7 +36,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s
+      start_period: 120s
     deploy:
       resources:
         limits:
@@ -203,7 +203,7 @@ services:
       redpanda:
         condition: service_started
       cockroach:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_PORT=3333
       - SERVER_SECRET=${SECRET}
@@ -232,7 +232,7 @@ services:
       redpanda:
         condition: service_started
       cockroach:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_SECRET=${SECRET}
       - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable
@@ -255,7 +255,7 @@ services:
     image: hardcoreeng/collaborator:${HULY_VERSION}
     depends_on:
       cockroach:
-        condition: service_healthy
+        condition: service_started
     environment:
       - COLLABORATOR_PORT=3078
       - SECRET=${SECRET}
@@ -288,7 +288,7 @@ services:
       elastic:
         condition: service_started
       cockroach:
-        condition: service_healthy
+        condition: service_started
     environment:
       - SERVER_SECRET=${SECRET}
       - DB_URL=postgresql://root@cockroach:26257/huly?sslmode=disable

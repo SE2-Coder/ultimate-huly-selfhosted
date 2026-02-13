@@ -68,6 +68,15 @@ services:
     networks:
       - dokploy-network
 
+  huly-init:
+    image: cockroachdb/cockroach:latest-v24.2
+    depends_on:
+      cockroach:
+        condition: service_healthy
+    command: sql --insecure --host=cockroach:26257 -e "CREATE DATABASE IF NOT EXISTS huly;"
+    networks:
+      - dokploy-network
+
   minio:
     image: "minio/minio"
     command: server /data --address ":9000" --console-address ":9001"
@@ -152,6 +161,8 @@ services:
   kvs:
     image: hardcoreeng/hulykvs:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       cockroach:
         condition: service_healthy
     environment:
@@ -168,6 +179,8 @@ services:
   account:
     image: hardcoreeng/account:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       redpanda:
         condition: service_started
       cockroach:
@@ -200,6 +213,8 @@ services:
   transactor:
     image: hardcoreeng/transactor:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       redpanda:
         condition: service_started
       cockroach:
@@ -229,6 +244,8 @@ services:
   workspace:
     image: hardcoreeng/workspace:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       redpanda:
         condition: service_started
       cockroach:
@@ -254,6 +271,8 @@ services:
   collaborator:
     image: hardcoreeng/collaborator:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       cockroach:
         condition: service_started
     environment:
@@ -285,6 +304,8 @@ services:
   fulltext:
     image: hardcoreeng/fulltext:${HULY_VERSION}
     depends_on:
+      huly-init:
+        condition: service_completed_successfully
       elastic:
         condition: service_started
       cockroach:

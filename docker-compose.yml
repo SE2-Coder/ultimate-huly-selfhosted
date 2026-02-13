@@ -101,7 +101,7 @@ services:
       cockroach:
         condition: service_healthy
     volumes:
-      - files:/data/huly_files:ro
+      - files:/data/huly_files:rw
       - /home/ubuntu/huly-infra/scripts:/scripts:ro
       - /home/ubuntu/huly-infra/backups_tmp:/tmp/backups
       - /home/ubuntu/huly-infra/.env_backup:/app/.env_backup:ro
